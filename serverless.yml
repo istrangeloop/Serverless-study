@@ -1,5 +1,5 @@
 # NOTE: update this with your service name
-service: notes-api
+service: minions-api
 
 # Create an optimized package for our functions 
 package:
@@ -22,11 +22,37 @@ provider:
   #
   #environment:
   #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+  environment:
+    orderTable: MinionShop
+    stockTable: Minions
+
+  # 'iamRoleStatements' defines the permission policy for the Lambda function.
+  # In this case Lambda functions are granted with permissions to access DynamoDB.
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
-  hello:
-    handler: handler.hello
+  # Defines an HTTP API endpoint that calls the main function in create.js
+  # - path: url path is /notes
+  # - method: POST request
+  stock:
+    handler: stock.main
     events:
       - http:
-          path: hello
+          path: stock
           method: get
+  order:
+    handler: order.main
+    events:
+      - http:
+          path: order
+          method: post
